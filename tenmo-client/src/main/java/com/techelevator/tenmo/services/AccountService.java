@@ -1,11 +1,16 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.util.BasicLogger;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AccountService {
@@ -20,14 +25,14 @@ public class AccountService {
 
     public AccountService(String url) {this.baseUrl = url;}
 
-    public Account[] getAll(){
-        Account[] accounts = null;
+    public List<Account> getAll(){
+        List<Account> accounts = new ArrayList<>();
         try{
-            ResponseEntity<Account[]> response =
+            ResponseEntity<List<Account>> response =
                     restTemplate.exchange(baseUrl + "/accounts",
                             HttpMethod.GET,
                             makeAuthEntity(),
-                            Account[].class);
+                            new ParameterizedTypeReference<List<Account>>() {});
             accounts = response.getBody();
         }catch (RestClientResponseException | ResourceAccessException e){
             BasicLogger.log(e.getMessage());
@@ -65,6 +70,21 @@ public class AccountService {
         return account;
     }
 
+    public String getAccountUsername(int accountId){
+        String username = null;
+        try{
+            ResponseEntity<String> response =
+                    restTemplate.exchange(baseUrl + "/account/user/" + accountId+"/username",
+                            HttpMethod.GET,
+                            makeAuthEntity(),
+                            String.class);
+            username = response.getBody();
+        }catch (RestClientResponseException | ResourceAccessException e){
+            BasicLogger.log(e.getMessage());
+        }
+        return username;
+    }
+
 
     public Account add(Account newAccount){
         HttpEntity<Account> entity = makeAccountEntity(newAccount);
@@ -80,10 +100,9 @@ public class AccountService {
 
     public boolean update(Account updatedAccount){
         HttpEntity<Account> entity = makeAccountEntity(updatedAccount);
-
         boolean success = false;
         try{
-            restTemplate.put(baseUrl + updatedAccount.getId(), entity, Account.class);
+            restTemplate.put(baseUrl + "/account/user/"+updatedAccount.getId()+"/balance", entity, Account.class);
             success = true;
         }catch (RestClientResponseException | ResourceAccessException e){
             BasicLogger.log(e.getMessage());

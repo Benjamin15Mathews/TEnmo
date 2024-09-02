@@ -10,5 +10,5 @@ public interface TransferTypeDao {
 
     TransferType getTransferTypeById(int id);
 
-    TransferType createTransferType(int id, String description);
+    TransferType createTransferType(String description);
 }

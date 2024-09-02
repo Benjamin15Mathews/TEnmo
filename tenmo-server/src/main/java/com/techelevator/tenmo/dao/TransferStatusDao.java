@@ -7,4 +7,8 @@ import java.util.List;
 public interface TransferStatusDao {
 
     List<TransferStatus> getTransferStatuses();
+
+    TransferStatus getTransferStatusById(int id);
+
+    TransferStatus createTransferStatus(String desc);
 }
